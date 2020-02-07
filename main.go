@@ -121,7 +121,7 @@ func parse(files []string) ([]*modfile.File, error) {
 func printMarkdown(table Table) {
 	line0 := "|"
 	line1 := "|---"
-	line2 := "| Go version |"
+	line2 := "| Go version "
 
 	for i, name := range table.Modules {
 		line0 = fmt.Sprintf("%s | %s ", line0, name)
@@ -188,7 +188,7 @@ func printMarkdown(table Table) {
 			prefix = pkg
 		}
 
-		line = fmt.Sprintf("| %s | %s |", prefix, line)
+		line = fmt.Sprintf("| %s | %s", prefix, line)
 
 		fmt.Println(line)
 	}

@@ -34,7 +34,7 @@ versions <full path to go.mod> <full path to go.mod>
 Using
 
 ```
-version ~/Repositories/versions/go.mod ~/Repositories/nit/go.mod
+versions ~/Repositories/versions/go.mod ~/Repositories/nit/go.mod
 ```
 
 The following output will be generated:
