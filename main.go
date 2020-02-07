@@ -165,7 +165,7 @@ func printMarkdown(table Table) {
 				lastversion = version
 			}
 
-			if same && lastversion != version {
+			if same && lastversion != version && version != "" {
 				same = false
 			}
 

@@ -43,9 +43,9 @@ The following output will be generated:
 | | github.com/MarioCarrion/nit  | github.com/MarioCarrion/versions  |
 |--- | :---:  | :---:  |
 | Go version  | 1.13  | 1.13  |
-| :white_check_mark: github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.3  |
-| github.com/google/go-cmp |  v0.2.0  |    |
-| github.com/pkg/errors |  v0.8.1  |    |
+| github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.2  |
+| :white_check_mark: github.com/google/go-cmp |  v0.2.0  |    |
+| :white_check_mark: github.com/pkg/errors |  v0.8.1  |    |
 | :white_check_mark: golang.org/x/mod |    |  v0.2.0  |
 ```
 
@@ -54,9 +54,9 @@ Which renders like this in Markdown
 | | github.com/MarioCarrion/nit  | github.com/MarioCarrion/versions  |
 |--- | :---:  | :---:  |
 | Go version  | 1.13  | 1.13  |
-| :white_check_mark: github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.3  |
-| github.com/google/go-cmp |  v0.2.0  |    |
-| github.com/pkg/errors |  v0.8.1  |    |
+| github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.2  |
+| :white_check_mark: github.com/google/go-cmp |  v0.2.0  |    |
+| :white_check_mark: github.com/pkg/errors |  v0.8.1  |    |
 | :white_check_mark: golang.org/x/mod |    |  v0.2.0  |
 
 ## Development requirements
