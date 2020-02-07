@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
+	"os"
 	"sort"
 
 	"golang.org/x/mod/modfile"
@@ -17,7 +17,6 @@ type (
 	}
 
 	Module struct {
-		// Path            string
 		Version         string
 		IsIndirect      bool
 		ReplacedPath    string
@@ -26,35 +25,31 @@ type (
 )
 
 func main() {
-	parse := func(file string) *modfile.File {
-		data, err := ioutil.ReadFile(file)
-		if err != nil {
-			log.Fatalf("ioutil %s", err)
-		}
-
-		f, err := modfile.Parse(file, data, nil)
-		if err != nil {
-			log.Fatalf("log %s", err)
-		}
-		return f
+	params := os.Args[1:]
+	if len(params) == 0 {
+		fmt.Println("path to go.mod files required")
+		os.Exit(1)
 	}
 
-	files := []string{
-		"repo1/go.mod",
-		"repo2/go.mod",
-		"repo2/go.mod",
+	parsed, err := parse(params)
+	if err != nil {
+		fmt.Printf("error parsing files %s\n", err)
+		os.Exit(1)
 	}
 
-	sort.Strings(files)
+	table := newTable(parsed)
 
-	parsed := make([]*modfile.File, len(files))
-	for i, f := range files {
-		parsed[i] = parse(f)
-	}
+	//-
 
+	printMarkdown(table)
+}
+
+//-
+
+func newTable(parsed []*modfile.File) Table {
 	table := Table{}
-	table.Modules = make([]string, len(files))
-	table.Versions = make([]string, len(files))
+	table.Modules = make([]string, len(parsed))
+	table.Versions = make([]string, len(parsed))
 	table.Packages = make(map[string][]Module)
 
 	//-
@@ -89,14 +84,47 @@ func main() {
 		}
 	}
 
-	//-
+	return table
+}
 
+func parse(files []string) ([]*modfile.File, error) {
+	sort.Strings(files)
+
+	parse := func(file string) (*modfile.File, error) {
+		data, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, err
+		}
+
+		f, err := modfile.Parse(file, data, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		return f, nil
+	}
+
+	var err error
+
+	parsed := make([]*modfile.File, len(files))
+
+	for i, f := range files {
+		parsed[i], err = parse(f)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return parsed, nil
+}
+
+func printMarkdown(table Table) {
 	line0 := "|"
 	line1 := "|---"
 	line2 := "| Go version |"
 
 	for i, name := range table.Modules {
-		line0 = fmt.Sprintf("%s | %s ", line0, string(name))
+		line0 = fmt.Sprintf("%s | %s ", line0, name)
 		line1 = fmt.Sprintf("%s | :---: ", line1)
 		line2 = fmt.Sprintf("%s | %s ", line2, table.Versions[i])
 	}
@@ -108,7 +136,8 @@ func main() {
 	sortedpkgs := make([]string, len(table.Packages))
 
 	var index int
-	for k, _ := range table.Packages {
+
+	for k := range table.Packages {
 		sortedpkgs[index] = k
 		index++
 	}
@@ -144,6 +173,7 @@ func main() {
 			if p.IsIndirect {
 				line = fmt.Sprintf("%s :question: ", line)
 			}
+
 			if p.ReplacedVersion != "" {
 				line = fmt.Sprintf("%s :exclamation: ", line)
 			}
@@ -158,7 +188,8 @@ func main() {
 			prefix = pkg
 		}
 
-		line = fmt.Sprintf("| %s | %s |\n", prefix, line)
-		fmt.Printf(line)
+		line = fmt.Sprintf("| %s | %s |", prefix, line)
+
+		fmt.Println(line)
 	}
 }
