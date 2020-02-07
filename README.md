@@ -33,7 +33,8 @@ versions <full path to go.mod> <full path to go.mod>
 
 Using
 
-```version ~/Repositories/versions/go.mod ~/Repositories/nit/go.mod
+```
+version ~/Repositories/versions/go.mod ~/Repositories/nit/go.mod
 ```
 
 The following output will be generated:
@@ -42,7 +43,7 @@ The following output will be generated:
 | | github.com/MarioCarrion/nit  | github.com/MarioCarrion/versions  |
 |--- | :---:  | :---:  |
 | Go version | | 1.13  | 1.13  |
-| github.com/golangci/golangci-lint |  v1.20.0  |  v1.23.3  |  |
+| :white_check_mark: github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.3  |  |
 | github.com/google/go-cmp |  v0.2.0  |    |  |
 | github.com/pkg/errors |  v0.8.1  |    |  |
 | :white_check_mark: golang.org/x/mod |    |  v0.2.0  |  |
@@ -53,7 +54,7 @@ Which renders like this in Markdown
 | | github.com/MarioCarrion/nit  | github.com/MarioCarrion/versions  |
 |--- | :---:  | :---:  |
 | Go version | | 1.13  | 1.13  |
-| github.com/golangci/golangci-lint |  v1.20.0  |  v1.23.3  |  |
+| :white_check_mark: github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.3  |  |
 | github.com/google/go-cmp |  v0.2.0  |    |  |
 | github.com/pkg/errors |  v0.8.1  |    |  |
 | :white_check_mark: golang.org/x/mod |    |  v0.2.0  |  |
