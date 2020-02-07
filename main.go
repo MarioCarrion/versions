@@ -121,17 +121,26 @@ func parse(files []string) ([]*modfile.File, error) {
 func printMarkdown(table Table) {
 	line0 := "|"
 	line1 := "|---"
-	line2 := "| Go version "
+	line2 := "Go version"
+
+	var lastversion string
+	same := true
 
 	for i, name := range table.Modules {
 		line0 = fmt.Sprintf("%s | %s ", line0, name)
 		line1 = fmt.Sprintf("%s | :---: ", line1)
-		line2 = fmt.Sprintf("%s | %s ", line2, table.Versions[i])
+		line2 = fmt.Sprintf("%s| %s", line2, table.Versions[i])
+
+		same, lastversion = sameVersion(same, lastversion, table.Versions[i])
 	}
 
 	fmt.Printf("%s |\n", line0)
 	fmt.Printf("%s |\n", line1)
-	fmt.Printf("%s |\n", line2)
+
+	if same {
+		line2 = fmt.Sprintf(":white_check_mark: %s", line2)
+	}
+	fmt.Printf("| %s \n", line2)
 
 	sortedpkgs := make([]string, len(table.Packages))
 
@@ -149,9 +158,10 @@ func printMarkdown(table Table) {
 	for _, pkg := range sortedpkgs {
 		v := table.Packages[pkg]
 
-		var line, lastversion string
+		var line string
 
-		same := true
+		same = true
+		lastversion = ""
 
 		for _, p := range v {
 			var version string
@@ -161,13 +171,7 @@ func printMarkdown(table Table) {
 				version = p.Version
 			}
 
-			if lastversion == "" {
-				lastversion = version
-			}
-
-			if same && lastversion != version && version != "" {
-				same = false
-			}
+			same, lastversion = sameVersion(same, lastversion, version)
 
 			line = fmt.Sprintf("%s %s ", line, version)
 			if p.IsIndirect {
@@ -182,6 +186,7 @@ func printMarkdown(table Table) {
 		}
 
 		var prefix string
+
 		if same {
 			prefix = fmt.Sprintf(":white_check_mark: %s", pkg)
 		} else {
@@ -192,4 +197,16 @@ func printMarkdown(table Table) {
 
 		fmt.Println(line)
 	}
+}
+
+func sameVersion(same bool, lastversion, newversion string) (bool, string) {
+	if lastversion == "" {
+		lastversion = newversion
+	}
+
+	if same && lastversion != newversion && newversion != "" {
+		same = false
+	}
+
+	return same, lastversion
 }
