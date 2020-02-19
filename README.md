@@ -7,8 +7,8 @@
 
 ## Installing
 
-* Using `go` (< 11.1): `go install github.com/MarioCarrion/versions` **or** download a precompiled release.
-* Using `go` (>= 1.11): `GO111MODULE=on go get github.com/MarioCarrion/versions`,
+* Using `go` (< 11.1): `go install github.com/MarioCarrion/versions/cmd/versions` **or** download a precompiled release.
+* Using `go` (>= 1.11): `GO111MODULE=on go get github.com/MarioCarrion/versions/cmd/versions`,
 * Using it as a dependency with the [`tools.go` paradigm](https://github.com/go-modules-by-example/index/blob/master/010_tools/README.md):
 
 ```go
@@ -17,7 +17,7 @@
 package tools
 
 import (
-	_ "github.com/MarioCarrion/versions"
+	_ "github.com/MarioCarrion/versions/cmd/versions"
 )
 ```
 
