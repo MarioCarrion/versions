@@ -17,9 +17,11 @@ func PrintMarkdown(gomods GoMods) {
 	header1.WriteString("|---")
 
 	header2.WriteString("|")
+
 	if gomods.SameGoVersions {
 		header2.WriteString(" :white_check_mark: ")
 	}
+
 	header2.WriteString("Go ")
 
 	for i, name := range gomods.Names {

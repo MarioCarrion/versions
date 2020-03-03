@@ -36,7 +36,7 @@ type (
 )
 
 // NewGoMods returns categorized Go Modules depending on versions being used.
-func NewGoMods(files []string) (GoMods, error) {
+func NewGoMods(files []string) (GoMods, error) { //nolint: funlen
 	parsed, err := NewModFiles(files)
 	if err != nil {
 		return GoMods{}, err
