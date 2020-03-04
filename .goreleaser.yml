@@ -1,4 +1,4 @@
-project_name: version
+project_name: versions
 before:
   hooks:
 builds:
@@ -7,7 +7,7 @@ builds:
     binary: versions
     env:
       - CGO_ENABLED=0
-archive:
+archives:
   replacements:
     darwin: Darwin
     linux: Linux
