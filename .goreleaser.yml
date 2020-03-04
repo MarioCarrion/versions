@@ -1,6 +1,7 @@
 project_name: versions
 before:
   hooks:
+    - go mod download
 builds:
   -
     main: ./cmd/versions/main.go
@@ -8,15 +9,15 @@ builds:
     env:
       - CGO_ENABLED=0
 archives:
-  replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
-  files:
-    - README.md
-    - LICENSE
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    files:
+      - README.md
+      - LICENSE
 checksum:
   name_template: 'checksums.txt'
 snapshot:
