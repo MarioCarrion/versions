@@ -21,6 +21,8 @@ type (
 
 	Versions []Version
 
+	//-
+
 	Module struct {
 		GoVersion string
 		Packages  map[string]Package
@@ -28,6 +30,7 @@ type (
 
 	// Package is the module being used by the repository Go module.
 	Package struct {
+		Name            PackageName
 		Version         string
 		IsIndirect      bool
 		ReplacedPath    string

@@ -7,9 +7,11 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-type parse struct {
-	parsed []*modfile.File
-}
+type (
+	parse struct {
+		parsed []*modfile.File
+	}
+)
 
 // NewModFiles returns a parsed and sorted (by module name) slice a modfiles.
 func NewModFiles(files []string) ([]*modfile.File, error) {
