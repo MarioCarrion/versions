@@ -3,13 +3,17 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/MarioCarrion/versions)](https://goreportcard.com/report/github.com/MarioCarrion/versions)
 [![Circle CI](https://circleci.com/gh/MarioCarrion/versions.svg?style=svg)](https://circleci.com/gh/MarioCarrion/versions)
 
-`versions` is a Go program for generating a report in Markdown of used packages from different repositories.
+Dependencies report generator for Go projects.
 
 ## Installing
 
-* Using `go` (< 11.1): `go install github.com/MarioCarrion/versions/cmd/versions` **or** download a precompiled release.
-* Using `go` (>= 1.11): `GO111MODULE=on go get github.com/MarioCarrion/versions/cmd/versions`,
-* Using it as a dependency with the [`tools.go` paradigm](https://github.com/go-modules-by-example/index/blob/master/010_tools/README.md):
+`versions` requires Go 1.14 or greater, install it using:
+
+```
+go install github.com/MarioCarrion/versions/cmd/versions
+```
+
+For projects depending on `versions` you could use the [`tools.go` paradigm](https://github.com/go-modules-by-example/index/blob/master/010_tools/README.md):
 
 ```go
 // +build tools
@@ -30,6 +34,8 @@ versions <full path to 1 go.mod> <full path to 2 go.mod> <full path to N go.mod>
 ```
 
 ## Example
+
+:warning: New outputs are currently in development, at the moment Flavored Markdown is the only supported.
 
 Using
 
@@ -61,4 +67,4 @@ Which renders like this in Markdown
 
 ## Development requirements
 
-Go >= 1.13.6
+Go >= 1.14

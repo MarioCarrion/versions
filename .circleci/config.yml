@@ -23,7 +23,7 @@ jobs:
       - run: go mod tidy
       - run: go install github.com/golangci/golangci-lint/cmd/golangci-lint github.com/MarioCarrion/nit/cmd/nit
       - run: golangci-lint run ./...
-      - run: nit -include-tests -pkg github.com/MarioCarrion/versions .
+      - run: nit -include-tests -pkg github.com/MarioCarrion/versions $(go list ./...)
   release:
     docker:
       - image: circleci/golang:1.14.0

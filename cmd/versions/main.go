@@ -1,3 +1,5 @@
+// +build go1.14
+
 package main
 
 import (
@@ -5,6 +7,7 @@ import (
 	"os"
 
 	"github.com/MarioCarrion/versions"
+	"github.com/MarioCarrion/versions/markdown"
 )
 
 func main() {
@@ -14,13 +17,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	gomods, err := versions.NewGoMods(params)
+	gomods, err := versions.New(params)
 	if err != nil {
 		fmt.Printf("error parsing files %s\n", err)
 		os.Exit(1)
 	}
 
-	//-
+	// md := template.NewMarkdown(gomods, template.WithPackagesSorting(template.MarkdownPackagesSortingAlphabetically))
+	md := markdown.NewMarkdown(gomods, markdown.WithPackagesSorting(markdown.PackagesSortingAlphabeticallySupported))
 
-	versions.PrintMarkdown(gomods)
+	fmt.Println(md.String())
 }
