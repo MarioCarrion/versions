@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/senseyeio/diligent"
 
 	"github.com/MarioCarrion/versions"
 )
@@ -24,15 +25,17 @@ func Test_newPackages(t *testing.T) {
 		}
 
 		input struct {
-			sorting  PackagesSorting
-			packages []inputPkg
-			modules  inputModules
+			sorting     PackagesSorting
+			packages    []inputPkg
+			modules     inputModules
+			showLicense bool
 		}
 	)
 
-	newInput := func(sorting PackagesSorting) input {
+	newInput := func(sorting PackagesSorting, showLicense bool) input {
 		return input{
-			sorting: sorting,
+			sorting:     sorting,
+			showLicense: showLicense,
 			modules: inputModules{
 				values: []module{
 					{
@@ -49,12 +52,18 @@ func Test_newPackages(t *testing.T) {
 					"Module1": {
 						DependencyRequirements: map[versions.PackageName]versions.Package{
 							"pkg1": {
-								Name:    "pkg1",
-								Version: "v1",
+								Name:         "pkg1",
+								Version:      "v1",
+								ReplacedPath: "fixtures/license/valid",
 							},
 							"abc": {
 								Name:    "abc",
 								Version: "v1",
+								License: versions.License{
+									Identifier: "Test",
+									Name:       "LicenseName",
+									Category:   diligent.Permissive,
+								},
 							},
 							"diff": {
 								Name:    "diff",
@@ -69,8 +78,9 @@ func Test_newPackages(t *testing.T) {
 					"Module2": {
 						DependencyRequirements: map[versions.PackageName]versions.Package{
 							"pkg1": {
-								Name:    "pkg1",
-								Version: "v1",
+								Name:         "pkg1",
+								Version:      "v1",
+								ReplacedPath: "fixtures/license/valid",
 							},
 							"diff": {
 								Name:    "diff",
@@ -88,8 +98,9 @@ func Test_newPackages(t *testing.T) {
 				{
 					"Module1",
 					versions.Package{
-						Name:    "pkg1",
-						Version: "v1",
+						Name:         "pkg1",
+						Version:      "v1",
+						ReplacedPath: "fixtures/license/valid",
 					},
 				},
 				{
@@ -97,6 +108,11 @@ func Test_newPackages(t *testing.T) {
 					versions.Package{
 						Name:    "abc",
 						Version: "v1",
+						License: versions.License{
+							Identifier: "Test",
+							Name:       "LicenseName",
+							Category:   diligent.Permissive,
+						},
 					},
 				},
 				{
@@ -116,8 +132,9 @@ func Test_newPackages(t *testing.T) {
 				{
 					"Module2",
 					versions.Package{
-						Name:    "pkg1",
-						Version: "v1",
+						Name:         "pkg1",
+						Version:      "v1",
+						ReplacedPath: "fixtures/license/valid",
 					},
 				},
 				{
@@ -145,29 +162,38 @@ func Test_newPackages(t *testing.T) {
 	}{
 		{
 			"OK: PackagesSortingAsFound",
-			newInput(PackagesSortingAsFound),
-			`| :white_check_mark: pkg1 | v1 | v1 |
+			newInput(PackagesSortingAsFound, false),
+			`| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
 | :white_check_mark: abc | v1 |  |
 | diff | v2 | v1 |
 | adiff | v2 | v1 |
 `,
 		},
 		{
+			"OK: PackagesSortingAsFound with License",
+			newInput(PackagesSortingAsFound, true),
+			`| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
+| :white_check_mark: abc | v1<br>LicenseName - permissive |  |
+| diff | v2 | v1 |
+| adiff | v2 | v1 |
+`,
+		},
+		{
 			"OK: PackagesSortingAlphabeticallySupported",
-			newInput(PackagesSortingAlphabeticallySupported),
+			newInput(PackagesSortingAlphabeticallySupported, false),
 			`| :white_check_mark: abc | v1 |  |
-| :white_check_mark: pkg1 | v1 | v1 |
+| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
 | adiff | v2 | v1 |
 | diff | v2 | v1 |
 `,
 		},
 		{
 			"OK: PackagesSortingAlphabetically",
-			newInput(PackagesSortingAlphabetically),
+			newInput(PackagesSortingAlphabetically, false),
 			`| :white_check_mark: abc | v1 |  |
 | adiff | v2 | v1 |
 | diff | v2 | v1 |
-| :white_check_mark: pkg1 | v1 | v1 |
+| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
 `,
 		},
 	}
@@ -187,7 +213,7 @@ func Test_newPackages(t *testing.T) {
 				Modules:  test.input.modules.dependencies,
 			}
 
-			pkgs := newPackages(versions, test.input.modules.values, test.input.sorting)
+			pkgs := newPackages(versions, test.input.modules.values, test.input.sorting, test.input.showLicense)
 			if got := pkgs.String(); !cmp.Equal(got, test.expected) {
 				t.Fatalf("expected values do not match: %s", cmp.Diff(got, test.expected))
 			}
@@ -288,8 +314,8 @@ func Test_packageSets_String(t *testing.T) {
 					},
 				},
 			},
-			`| :white_check_mark: name | v1/rversion | v2/rversion |
-| another | v1 | v2/rversion |
+			`| :white_check_mark: name | v1 - rpath/rversion | v2 - rpath/rversion |
+| another | v1 | v2 - rpath/rversion |
 `,
 		},
 	}

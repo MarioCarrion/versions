@@ -9,9 +9,10 @@ import (
 
 type (
 	packageSet struct {
-		same     bool
-		Name     versions.PackageName
-		packages []versions.Package
+		same        bool
+		showLicense bool
+		Name        versions.PackageName
+		packages    []versions.Package
 	}
 
 	packageSets []packageSet
@@ -22,14 +23,15 @@ type (
 	}
 )
 
-func newPackages(vs versions.Versions, modules []module, sorting PackagesSorting) packages {
+func newPackages(vs versions.Versions, modules []module, sorting PackagesSorting, showLicense bool) packages {
 	var res packages
 
 	for _, name := range vs.Packages.Names() {
 		set := packageSet{
-			Name:     name,
-			same:     vs.Packages.IsSame(name),
-			packages: make([]versions.Package, len(modules)),
+			Name:        name,
+			showLicense: showLicense,
+			same:        vs.Packages.IsSame(name),
+			packages:    make([]versions.Package, len(modules)),
 		}
 
 		for i, mod := range modules {
@@ -72,9 +74,21 @@ func (p packageSet) String() string {
 		str.WriteString(" | ")
 		str.WriteString(v.Version)
 
+		if v.ReplacedPath != "" {
+			str.WriteString(" - ")
+			str.WriteString(v.ReplacedPath)
+		}
+
 		if v.ReplacedVersion != "" {
 			str.WriteString("/")
 			str.WriteString(v.ReplacedVersion)
+		}
+
+		if p.showLicense && v.License.Identifier != "" {
+			str.WriteString("<br>")
+			str.WriteString(v.License.Name)
+			str.WriteString(" - ")
+			str.WriteString(string(v.License.Category))
 		}
 	}
 

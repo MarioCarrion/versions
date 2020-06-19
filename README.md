@@ -68,3 +68,9 @@ Which renders like this in Markdown
 ## Development requirements
 
 Go >= 1.14
+
+## Project dependencies
+
+* For determining the LICENSE used by the project:
+  * [senseyeio/diligent](https://github.com/senseyeio/diligent): Get the licenses associated with your software dependencies
+  * [go-enry/go-license-detector](https://github.com/go-enry/go-license-detector): Reliable project licenses detector.

@@ -1,6 +1,9 @@
 package versions_test
 
 import (
+	"fmt"
+	"go/build"
+	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -249,6 +252,121 @@ func Test_New(t *testing.T) {
 				if packages := got.Packages.Values(pkg); !cmp.Equal(packages, expectedPkg) {
 					t.Fatalf("expected goversions do not match: %s", cmp.Diff(packages, expectedPkg))
 				}
+			}
+		})
+	}
+}
+
+func Test_Package(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    versions.Package
+		setup    func() func()
+		expected string
+	}{
+		{
+			"Yes GOPATH + Yes Version + Yes ReplacedPath + Yes ReplacedVersion",
+			versions.Package{
+				Name:            "Name",
+				Version:         "Version",
+				ReplacedPath:    "NewPath",
+				ReplacedVersion: "NewVersion",
+			},
+			func() func() {
+				old := os.Getenv("GOPATH")
+				os.Setenv("GOPATH", "/blah")
+				return func() {
+					os.Setenv("GOPATH", old)
+				}
+			},
+			"/blah/pkg/mod/NewPath@NewVersion",
+		},
+		{
+			"Yes GOPATH + Yes Version + Yes ReplacedPath + No ReplacedVersion",
+			versions.Package{
+				Name:         "Name",
+				Version:      "Version",
+				ReplacedPath: "NewPath",
+			},
+			func() func() {
+				old := os.Getenv("GOPATH")
+				os.Setenv("GOPATH", "/blah")
+				return func() {
+					os.Setenv("GOPATH", old)
+				}
+			},
+			"/blah/pkg/mod/NewPath",
+		},
+		{
+			"Yes GOPATH + Yes Version + No ReplacedPath + Yes ReplacedVersion",
+			versions.Package{
+				Name:            "Name",
+				Version:         "Version",
+				ReplacedVersion: "NewVersion",
+			},
+			func() func() {
+				old := os.Getenv("GOPATH")
+				os.Setenv("GOPATH", "/blah")
+				return func() {
+					os.Setenv("GOPATH", old)
+				}
+			},
+			"/blah/pkg/mod/Name@Version",
+		},
+		{
+			"Yes GOPATH + No Version + Yes ReplacedPath + Yes ReplacedVersion",
+			versions.Package{
+				Name:            "Name",
+				ReplacedPath:    "NewPath",
+				ReplacedVersion: "NewVersion",
+			},
+			func() func() {
+				old := os.Getenv("GOPATH")
+				os.Setenv("GOPATH", "/blah")
+				return func() {
+					os.Setenv("GOPATH", old)
+				}
+			},
+			"/blah/pkg/mod/NewPath@NewVersion",
+		},
+		{
+			"Yes GOPATH + Yes Version + No ReplacedPath + Yes ReplacedVersion",
+			versions.Package{
+				Name:            "Name",
+				Version:         "Version",
+				ReplacedVersion: "NewVersion",
+			},
+			func() func() {
+				old := os.Getenv("GOPATH")
+				os.Setenv("GOPATH", "/blah")
+				return func() {
+					os.Setenv("GOPATH", old)
+				}
+			},
+			"/blah/pkg/mod/Name@Version",
+		},
+		{
+			"No GOPATH",
+			versions.Package{
+				Name:    "Name",
+				Version: "Version",
+			},
+			func() func() {
+				return func() {}
+			},
+			fmt.Sprintf("%s/pkg/mod/Name@Version", build.Default.GOPATH),
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			teardown := test.setup()
+			defer teardown()
+			if got := test.input.Path(); got != test.expected {
+				t.Fatalf("expected %s, got %s", test.expected, got)
 			}
 		})
 	}

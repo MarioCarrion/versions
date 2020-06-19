@@ -24,7 +24,9 @@ func main() {
 	}
 
 	// md := template.NewMarkdown(gomods, template.WithPackagesSorting(template.MarkdownPackagesSortingAlphabetically))
-	md := markdown.NewMarkdown(gomods, markdown.WithPackagesSorting(markdown.PackagesSortingAlphabeticallySupported))
+	md := markdown.NewMarkdown(gomods,
+		markdown.WithPackagesSorting(markdown.PackagesSortingAlphabeticallySupported),
+		markdown.WithPackagesLicense(true))
 
 	fmt.Println(md.String())
 }

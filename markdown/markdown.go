@@ -19,9 +19,10 @@ type (
 
 	// Markdown renders versions as basic flavored Markdown.
 	Markdown struct {
-		versions       versions.Versions
-		modulesSortBy  ModulesSorting
-		packagesSortBy PackagesSorting
+		versions            versions.Versions
+		modulesSortBy       ModulesSorting
+		packagesSortBy      PackagesSorting
+		packagesShowLicense bool
 	}
 
 	// Option is configuration option for this renderer.
@@ -74,6 +75,13 @@ func WithModulesSorting(opt ModulesSorting) Option {
 	}
 }
 
+// WithPackagesLicense allows display the package License when present.
+func WithPackagesLicense(opt bool) Option {
+	return func(m *Markdown) {
+		m.packagesShowLicense = opt
+	}
+}
+
 // WithPackagesSorting allows specifying the sorting option for packages.
 func WithPackagesSorting(opt PackagesSorting) Option {
 	return func(m *Markdown) {
@@ -92,7 +100,7 @@ func (m Markdown) String() string {
 	}
 
 	header := newHeader(m.modulesSortBy, m.versions.GoVersions.IsSame(), mods)
-	pkgs := newPackages(m.versions, header.modules, m.packagesSortBy)
+	pkgs := newPackages(m.versions, header.modules, m.packagesSortBy, m.packagesShowLicense)
 
 	var str strings.Builder
 

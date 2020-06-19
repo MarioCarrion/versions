@@ -4,7 +4,51 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/senseyeio/diligent"
 )
+
+func Test_newLicense(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    string
+		expected License
+	}{
+		{
+			"OK",
+			"fixtures/license/valid/",
+			License{
+				Identifier: "MIT",
+				Name:       "MIT License",
+				ShortName:  "MIT License",
+				Type:       diligent.OpenSource,
+				Category:   diligent.Permissive,
+			},
+		},
+		{
+			"OK: invalid",
+			"fixtures/license/invalid/",
+			License{},
+		},
+		{
+			"OK: not in diligent",
+			"fixtures/license/unknown/",
+			License{},
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			if actual := newLicense(test.input); !cmp.Equal(actual, test.expected) {
+				t.Fatalf("expected values do not match: %s", cmp.Diff(actual, test.expected))
+			}
+		})
+	}
+}
 
 func Test_newModFiles(t *testing.T) {
 	type expected struct {

@@ -1,8 +1,15 @@
 package versions
 
 import (
+	"fmt"
+	"go/build"
 	"io/ioutil"
+	"os"
 
+	"github.com/go-enry/go-license-detector/v4/licensedb"
+	"github.com/go-enry/go-license-detector/v4/licensedb/api"
+	"github.com/go-enry/go-license-detector/v4/licensedb/filer"
+	"github.com/senseyeio/diligent"
 	"golang.org/x/mod/modfile"
 )
 
@@ -18,6 +25,15 @@ type (
 
 	//-
 
+	// License represents the LICENSE used by a Package.
+	License struct {
+		Identifier string
+		Name       string
+		ShortName  string
+		Type       diligent.Type
+		Category   diligent.Category
+	}
+
 	// Package represents an imported Go packaged in a Module.
 	Package struct {
 		Name            PackageName
@@ -25,6 +41,7 @@ type (
 		IsIndirect      bool
 		ReplacedPath    string
 		ReplacedVersion string
+		License         License
 	}
 
 	//-
@@ -80,18 +97,71 @@ func New(files []string) (Versions, error) {
 		Modules: make(map[ModuleName]Module),
 	}
 
+	licenses := make(map[string]License)
+
 	for _, modfile := range parsed {
 		module := newModule(modfile)
 
 		result.Modules[module.Name] = module
 		result.GoVersions.Set(module.Name, module.GoVersion)
 
-		for _, pkg := range module.DependencyRequirements {
+		for k, pkg := range module.DependencyRequirements {
+			license, ok := licenses[pkg.Path()]
+			if !ok {
+				license = newLicense(pkg.Path())
+				licenses[pkg.Path()] = license
+			}
+
+			pkg.License = license
+
+			module.DependencyRequirements[k] = pkg
+
 			result.Packages.Set(module.Name, pkg)
 		}
 	}
 
 	return result, nil
+}
+
+func newLicense(path string) License {
+	filer, err := filer.FromDirectory(path)
+	if err != nil {
+		return License{}
+	}
+
+	licenses, err := licensedb.Detect(filer)
+	if err != nil {
+		return License{}
+	}
+
+	var (
+		match api.Match
+		name  string
+	)
+
+	for k, v := range licenses {
+		if name == "" || v.Confidence > match.Confidence {
+			match = v
+			name = k
+		}
+	}
+
+	if name == "" {
+		return License{}
+	}
+
+	license, err := diligent.GetLicenseFromIdentifier(name)
+	if err != nil {
+		return License{}
+	}
+
+	return License{
+		Identifier: license.Identifier,
+		Name:       license.Name,
+		ShortName:  license.ShortName,
+		Type:       license.Type,
+		Category:   license.Category,
+	}
 }
 
 func newModFiles(files []string) ([]*modfile.File, error) {
@@ -186,6 +256,28 @@ func (g *GoVersions) Values() []ModuleGoVersion {
 	}
 
 	return result
+}
+
+// Path returns the full filesystem path pointing to the package
+func (p Package) Path() string {
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+
+	version := func(v string) string {
+		if v == "" {
+			return ""
+		}
+
+		return fmt.Sprintf("@%s", v)
+	}
+
+	if p.ReplacedPath != "" {
+		return fmt.Sprintf("%s/pkg/mod/%s%s", gopath, p.ReplacedPath, version(p.ReplacedVersion))
+	}
+
+	return fmt.Sprintf("%s/pkg/mod/%s%s", gopath, p.Name, version(p.Version))
 }
 
 // IsSame returns true when all Modules use the same Package Version.
