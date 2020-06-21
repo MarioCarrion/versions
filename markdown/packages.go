@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -59,42 +60,45 @@ func newPackages(vs versions.Versions, modules []module, sorting PackagesSorting
 	return res
 }
 
-func (p packageSet) String() string {
-	var str strings.Builder
+func (p packageSet) Values() []string {
+	res := make([]string, len(p.packages)+1)
 
-	str.WriteString("| ")
+	var str string
 
-	if p.same {
-		str.WriteString(":white_check_mark: ")
+	if p.same { // XXX: Make emoji option configurable
+		// str = "✓ "
+		// str = "✅"
+		str = ":white_check_mark: "
 	}
 
-	str.WriteString(string(p.Name))
+	res[0] = fmt.Sprintf("%s%s", str, p.Name)
 
-	for _, v := range p.packages {
-		str.WriteString(" | ")
-		str.WriteString(v.Version)
+	for i, v := range p.packages {
+		var b strings.Builder
+
+		b.WriteString(v.Version)
 
 		if v.ReplacedPath != "" {
-			str.WriteString(" - ")
-			str.WriteString(v.ReplacedPath)
+			b.WriteString(" ")
+			b.WriteString(v.ReplacedPath)
 		}
 
 		if v.ReplacedVersion != "" {
-			str.WriteString("/")
-			str.WriteString(v.ReplacedVersion)
+			b.WriteString(" ")
+			b.WriteString(v.ReplacedVersion)
 		}
 
 		if p.showLicense && v.License.Identifier != "" {
-			str.WriteString("<br>")
-			str.WriteString(v.License.Name)
-			str.WriteString(" - ")
-			str.WriteString(string(v.License.Category))
+			b.WriteString("<br>")
+			b.WriteString(string(v.License.Category))
+			b.WriteString(" ")
+			b.WriteString(v.License.Name)
 		}
+
+		res[i+1] = b.String()
 	}
 
-	str.WriteString(" |\n")
-
-	return str.String()
+	return res
 }
 
 func (p packageSets) Len() int {
@@ -113,28 +117,24 @@ func (p packageSets) Swap(i, j int) {
 
 //-
 
-func (p packageSets) String() string {
-	var str strings.Builder
+func (p packages) Values() [][]string {
+	var res [][]string
 
-	sets := []packageSet(p)
+	if len(p.same) > 0 {
+		setsSame := []packageSet(p.same)
 
-	for _, s := range sets {
-		str.WriteString(s.String())
+		for _, val := range setsSame {
+			res = append(res, val.Values())
+		}
 	}
 
-	return str.String()
-}
+	if len(p.different) > 0 {
+		setsSame := []packageSet(p.different)
 
-func (p packages) String() string {
-	var str strings.Builder
-
-	if p.same != nil {
-		str.WriteString(p.same.String())
+		for _, val := range setsSame {
+			res = append(res, val.Values())
+		}
 	}
 
-	if p.different != nil {
-		str.WriteString(p.different.String())
-	}
-
-	return str.String()
+	return res
 }

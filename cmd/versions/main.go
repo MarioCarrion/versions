@@ -23,8 +23,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// md := template.NewMarkdown(gomods, template.WithPackagesSorting(template.MarkdownPackagesSortingAlphabetically))
 	md := markdown.NewMarkdown(gomods,
+		markdown.WithModulesSorting(markdown.ModulesSortingAlphabetically),
 		markdown.WithPackagesSorting(markdown.PackagesSortingAlphabeticallySupported),
 		markdown.WithPackagesLicense(true))
 

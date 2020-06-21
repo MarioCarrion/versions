@@ -71,7 +71,7 @@ func Test_module(t *testing.T) {
 
 //- header
 
-func Test_header_String(t *testing.T) {
+func Test_header(t *testing.T) {
 	t.Parallel()
 
 	type (
@@ -80,12 +80,17 @@ func Test_header_String(t *testing.T) {
 			same    bool
 			values  []versions.Module
 		}
+
+		expected struct {
+			goVersions []string
+			names      []string
+		}
 	)
 
 	tests := []struct {
 		name     string
 		input    input
-		expected string
+		expected expected
 	}{
 		{
 			"OK: ModulesSortingAsInput and Same",
@@ -112,9 +117,10 @@ func Test_header_String(t *testing.T) {
 					},
 				},
 			},
-			`| | fixture.com/new_module_replace | fixture.com/new_module_indirect | fixture.com/new_module_simple |
-| :white_check_mark: Go | 1.14 | 1.14 | 1.14 |
-`,
+			expected{
+				goVersions: []string{":white_check_mark: Go", "1.14", "1.14", "1.14"},
+				names:      []string{"", "fixture.com/new_module_replace", "fixture.com/new_module_indirect", "fixture.com/new_module_simple"},
+			},
 		},
 		{
 			"OK: ModulesSortingAlphabetically and Different",
@@ -141,9 +147,10 @@ func Test_header_String(t *testing.T) {
 					},
 				},
 			},
-			`| | fixture.com/new_module_indirect | fixture.com/new_module_replace | fixture.com/new_module_simple |
-| Go | 1.15 | 1.14 | 1.13 |
-`,
+			expected{
+				goVersions: []string{"Go", "1.15", "1.14", "1.13"},
+				names:      []string{"", "fixture.com/new_module_indirect", "fixture.com/new_module_replace", "fixture.com/new_module_simple"},
+			},
 		},
 	}
 
@@ -152,9 +159,16 @@ func Test_header_String(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := newHeader(test.input.sorting, test.input.same, test.input.values).String()
-			if got != test.expected {
-				t.Fatalf("expected %s, got %s", test.expected, got)
+			header := newHeader(test.input.sorting, test.input.same, test.input.values)
+
+			goVersions := header.GoVersions()
+			if !cmp.Equal(goVersions, test.expected.goVersions) {
+				t.Fatalf("expected values do not match: %s", cmp.Diff(goVersions, test.expected.goVersions))
+			}
+
+			names := header.Names()
+			if !cmp.Equal(names, test.expected.names) {
+				t.Fatalf("expected values do not match: %s", cmp.Diff(names, test.expected.names))
 			}
 		})
 	}

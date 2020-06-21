@@ -158,43 +158,47 @@ func Test_newPackages(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    input
-		expected string
+		expected [][]string
 	}{
 		{
 			"OK: PackagesSortingAsFound",
 			newInput(PackagesSortingAsFound, false),
-			`| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
-| :white_check_mark: abc | v1 |  |
-| diff | v2 | v1 |
-| adiff | v2 | v1 |
-`,
+			[][]string{
+				{":white_check_mark: pkg1", "v1 fixtures/license/valid", "v1 fixtures/license/valid"},
+				{":white_check_mark: abc", "v1", ""},
+				{"diff", "v2", "v1"},
+				{"adiff", "v2", "v1"},
+			},
 		},
 		{
 			"OK: PackagesSortingAsFound with License",
 			newInput(PackagesSortingAsFound, true),
-			`| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
-| :white_check_mark: abc | v1<br>LicenseName - permissive |  |
-| diff | v2 | v1 |
-| adiff | v2 | v1 |
-`,
+			[][]string{
+				{":white_check_mark: pkg1", "v1 fixtures/license/valid", "v1 fixtures/license/valid"},
+				{":white_check_mark: abc", "v1<br>permissive LicenseName", ""},
+				{"diff", "v2", "v1"},
+				{"adiff", "v2", "v1"},
+			},
 		},
 		{
 			"OK: PackagesSortingAlphabeticallySupported",
 			newInput(PackagesSortingAlphabeticallySupported, false),
-			`| :white_check_mark: abc | v1 |  |
-| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
-| adiff | v2 | v1 |
-| diff | v2 | v1 |
-`,
+			[][]string{
+				{":white_check_mark: abc", "v1", ""},
+				{":white_check_mark: pkg1", "v1 fixtures/license/valid", "v1 fixtures/license/valid"},
+				{"adiff", "v2", "v1"},
+				{"diff", "v2", "v1"},
+			},
 		},
 		{
 			"OK: PackagesSortingAlphabetically",
 			newInput(PackagesSortingAlphabetically, false),
-			`| :white_check_mark: abc | v1 |  |
-| adiff | v2 | v1 |
-| diff | v2 | v1 |
-| :white_check_mark: pkg1 | v1 - fixtures/license/valid | v1 - fixtures/license/valid |
-`,
+			[][]string{
+				{":white_check_mark: abc", "v1", ""},
+				{"adiff", "v2", "v1"},
+				{"diff", "v2", "v1"},
+				{":white_check_mark: pkg1", "v1 fixtures/license/valid", "v1 fixtures/license/valid"},
+			},
 		},
 	}
 
@@ -214,7 +218,7 @@ func Test_newPackages(t *testing.T) {
 			}
 
 			pkgs := newPackages(versions, test.input.modules.values, test.input.sorting, test.input.showLicense)
-			if got := pkgs.String(); !cmp.Equal(got, test.expected) {
+			if got := pkgs.Values(); !cmp.Equal(got, test.expected) {
 				t.Fatalf("expected values do not match: %s", cmp.Diff(got, test.expected))
 			}
 		})
@@ -259,74 +263,6 @@ func Test_packageSets_Sort(t *testing.T) {
 
 			if !cmp.Equal(test.input, test.expected, cmp.AllowUnexported(packageSet{})) {
 				t.Fatalf("expected values do not match: %s", cmp.Diff(test.input, test.expected, cmp.AllowUnexported(packageSet{})))
-			}
-		})
-	}
-}
-
-func Test_packageSets_String(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name     string
-		input    packageSets
-		expected string
-	}{
-		{
-			"OK",
-			[]packageSet{
-				{
-					same: true,
-					Name: "name",
-					packages: []versions.Package{
-						{
-							Name:            "name",
-							Version:         "v1",
-							IsIndirect:      true,
-							ReplacedPath:    "rpath",
-							ReplacedVersion: "rversion",
-						},
-						{
-							Name:            "name",
-							Version:         "v2",
-							IsIndirect:      true,
-							ReplacedPath:    "rpath",
-							ReplacedVersion: "rversion",
-						},
-					},
-				},
-				{
-					same: false,
-					Name: "another",
-					packages: []versions.Package{
-						{
-							Name:       "another",
-							Version:    "v1",
-							IsIndirect: true,
-						},
-						{
-							Name:            "another",
-							Version:         "v2",
-							IsIndirect:      true,
-							ReplacedPath:    "rpath",
-							ReplacedVersion: "rversion",
-						},
-					},
-				},
-			},
-			`| :white_check_mark: name | v1 - rpath/rversion | v2 - rpath/rversion |
-| another | v1 | v2 - rpath/rversion |
-`,
-		},
-	}
-
-	for _, test := range tests {
-		test := test
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-
-			if got := test.input.String(); !cmp.Equal(got, test.expected) {
-				t.Fatalf("expected values do not match: %s", cmp.Diff(got, test.expected))
 			}
 		})
 	}

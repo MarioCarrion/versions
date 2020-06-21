@@ -3,7 +3,9 @@
 package markdown
 
 import (
-	"strings"
+	"os"
+
+	"github.com/olekukonko/tablewriter"
 
 	"github.com/MarioCarrion/versions"
 )
@@ -102,10 +104,21 @@ func (m Markdown) String() string {
 	header := newHeader(m.modulesSortBy, m.versions.GoVersions.IsSame(), mods)
 	pkgs := newPackages(m.versions, header.modules, m.packagesSortBy, m.packagesShowLicense)
 
-	var str strings.Builder
+	var data [][]string
 
-	str.WriteString(header.String())
-	str.WriteString(pkgs.String())
+	data = append(data, header.GoVersions())
+	data = append(data, pkgs.Values()...)
 
-	return str.String()
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader(header.Names())
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+	table.SetAutoFormatHeaders(false)
+	table.SetReflowDuringAutoWrap(false)
+	table.SetAutoWrapText(false)
+
+	table.AppendBulk(data)
+	table.Render()
+
+	return ""
 }

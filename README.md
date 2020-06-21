@@ -35,9 +35,9 @@ versions <full path to 1 go.mod> <full path to 2 go.mod> <full path to N go.mod>
 
 ## Example
 
-:warning: New outputs are currently in development, at the moment Flavored Markdown is the only supported.
+:warning: New outputs are currently in development, at the moment Flavored Markdown is the only supported one.
 
-Using
+Using:
 
 ```
 versions ~/Repositories/versions/go.mod ~/Repositories/nit/go.mod
@@ -46,24 +46,42 @@ versions ~/Repositories/versions/go.mod ~/Repositories/nit/go.mod
 The following output will be generated:
 
 ```
-| | github.com/MarioCarrion/nit  | github.com/MarioCarrion/versions  |
-|--- | :---:  | :---:  |
-| :white_check_mark: Go version| 1.13| 1.13
-| github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.2  |
-| :white_check_mark: github.com/google/go-cmp |  v0.2.0  |    |
-| :white_check_mark: github.com/pkg/errors |  v0.8.1  |    |
-| :white_check_mark: golang.org/x/mod |    |  v0.2.0  |
+|                                                              |    github.com/MarioCarrion/nit    |                                    github.com/MarioCarrion/versions                                    |
+|--------------------------------------------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------|
+| :white_check_mark: Go                                        |                              1.14 |                                                                                                   1.14 |
+| :white_check_mark: github.com/MarioCarrion/nit               |                                   | v0.6.5                                                                                                 |
+| :white_check_mark: github.com/go-enry/go-license-detector/v4 |                                   | v4.0.0<br>Apache License 2.0 permissive                                                                |
+| :white_check_mark: github.com/golangci/golangci-lint         | v1.23.8                           | v1.23.8                                                                                                |
+| :white_check_mark: github.com/google/go-cmp                  | v0.4.0<br>BSD-3-Clause permissive | v0.4.0<br>BSD-3-Clause permissive                                                                      |
+| :white_check_mark: github.com/olekukonko/tablewriter         |                                   | v0.0.4<br>MIT License permissive                                                                       |
+| :white_check_mark: github.com/pkg/errors                     | v0.9.1<br>BSD-2-Clause permissive |                                                                                                        |
+| :white_check_mark: github.com/senseyeio/diligent             |                                   | v0.0.0-20191014201558-431d9a760f2d github.com/MarioCarrion/diligent v0.0.0-20200617184744-03fbc970a7f7 |
+| :white_check_mark: golang.org/x/mod                          |                                   | v0.2.0<br>BSD-3-Clause permissive                                                                      |
 ```
 
 Which renders like this in Markdown
 
-| | github.com/MarioCarrion/nit  | github.com/MarioCarrion/versions  |
-|--- | :---:  | :---:  |
-| :white_check_mark: Go version| 1.13| 1.13
-| github.com/golangci/golangci-lint |  v1.23.3  |  v1.23.2  |
-| :white_check_mark: github.com/google/go-cmp |  v0.2.0  |    |
-| :white_check_mark: github.com/pkg/errors |  v0.8.1  |    |
-| :white_check_mark: golang.org/x/mod |    |  v0.2.0  |
+|                                                              |    github.com/MarioCarrion/nit    |                                    github.com/MarioCarrion/versions                                    |
+|--------------------------------------------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------|
+| :white_check_mark: Go                                        |                              1.14 |                                                                                                   1.14 |
+| :white_check_mark: github.com/MarioCarrion/nit               |                                   | v0.6.5                                                                                                 |
+| :white_check_mark: github.com/go-enry/go-license-detector/v4 |                                   | v4.0.0<br>Apache License 2.0 permissive                                                                |
+| :white_check_mark: github.com/golangci/golangci-lint         | v1.23.8                           | v1.23.8                                                                                                |
+| :white_check_mark: github.com/google/go-cmp                  | v0.4.0<br>BSD-3-Clause permissive | v0.4.0<br>BSD-3-Clause permissive                                                                      |
+| :white_check_mark: github.com/olekukonko/tablewriter         |                                   | v0.0.4<br>MIT License permissive                                                                       |
+| :white_check_mark: github.com/pkg/errors                     | v0.9.1<br>BSD-2-Clause permissive |                                                                                                        |
+| :white_check_mark: github.com/senseyeio/diligent             |                                   | v0.0.0-20191014201558-431d9a760f2d github.com/MarioCarrion/diligent v0.0.0-20200617184744-03fbc970a7f7 |
+| :white_check_mark: golang.org/x/mod                          |                                   | v0.2.0<br>BSD-3-Clause permissive                                                                      |
+
+## Features
+
+* [X] Packages: license support.
+* [ ] Packages: update availables support.
+    * [ ] Merge Requests creation for Gitlab.
+    * [ ] Pull Requests creation for Github.
+* [ ] Packages: efferent and afferent metrics support.
+* [ ] Output: Graphviz .
+* [ ] Output: JSON.
 
 ## Development requirements
 

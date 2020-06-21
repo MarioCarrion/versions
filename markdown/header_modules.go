@@ -1,8 +1,8 @@
 package markdown
 
 import (
+	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/MarioCarrion/versions"
 )
@@ -37,38 +37,32 @@ func newHeader(sorting ModulesSorting, same bool, values []versions.Module) head
 	}
 }
 
-func (h header) String() string {
-	var str strings.Builder
+func (h header) GoVersions() []string {
+	res := make([]string, len(h.modules)+1)
 
-	// Modules header
-
-	str.WriteString("|")
-
-	for _, mod := range h.modules {
-		str.WriteString(" | ")
-		str.WriteString(string(mod.Name))
-	}
-
-	str.WriteString(" |\n")
-
-	// Modules Go Versions
-
-	str.WriteString("| ")
+	var str string
 
 	if h.same {
-		str.WriteString(":white_check_mark: ")
+		str = ":white_check_mark: "
 	}
 
-	str.WriteString("Go")
+	res[0] = fmt.Sprintf("%sGo", str)
 
-	for _, mod := range h.modules {
-		str.WriteString(" | ")
-		str.WriteString(string(mod.GoVersion))
+	for i, mod := range h.modules {
+		res[i+1] = string(mod.GoVersion)
 	}
 
-	str.WriteString(" |\n")
+	return res
+}
 
-	return str.String()
+func (h header) Names() []string {
+	res := make([]string, len(h.modules)+1)
+
+	for i, mod := range h.modules {
+		res[i+1] = string(mod.Name)
+	}
+
+	return res
 }
 
 func (m modules) Len() int {
