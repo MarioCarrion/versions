@@ -1,6 +1,6 @@
 module github.com/MarioCarrion/versions
 
-go 1.14
+go 1.15
 
 require (
 	github.com/MarioCarrion/nit v0.6.5

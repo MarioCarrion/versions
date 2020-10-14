@@ -7,7 +7,7 @@ Dependencies report generator for Go projects.
 
 ## Installing
 
-`versions` requires Go 1.14 or greater, install it using:
+`versions` requires Go 1.15 or greater, install it using:
 
 ```
 go install github.com/MarioCarrion/versions/cmd/versions

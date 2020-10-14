@@ -5,6 +5,7 @@ import (
 	"go/build"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/go-enry/go-license-detector/v4/licensedb"
 	"github.com/go-enry/go-license-detector/v4/licensedb/api"
@@ -121,6 +122,19 @@ func New(files []string) (Versions, error) {
 	}
 
 	return result, nil
+}
+
+func goModCache() string {
+	if gomodcache := os.Getenv("GOMODCACHE"); gomodcache != "" {
+		return gomodcache
+	}
+
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+
+	return filepath.Join(gopath, "pkg", "mod")
 }
 
 func newLicense(path string) License {
@@ -260,11 +274,6 @@ func (g *GoVersions) Values() []ModuleGoVersion {
 
 // Path returns the full filesystem path pointing to the package
 func (p Package) Path() string {
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		gopath = build.Default.GOPATH
-	}
-
 	version := func(v string) string {
 		if v == "" {
 			return ""
@@ -273,11 +282,14 @@ func (p Package) Path() string {
 		return fmt.Sprintf("@%s", v)
 	}
 
+	var newVersion string
 	if p.ReplacedPath != "" {
-		return fmt.Sprintf("%s/pkg/mod/%s%s", gopath, p.ReplacedPath, version(p.ReplacedVersion))
+		newVersion = fmt.Sprintf("%s%s", p.ReplacedPath, version(p.ReplacedVersion))
+	} else {
+		newVersion = fmt.Sprintf("%s%s", p.Name, version(p.Version))
 	}
 
-	return fmt.Sprintf("%s/pkg/mod/%s%s", gopath, p.Name, version(p.Version))
+	return filepath.Join(goModCache(), newVersion)
 }
 
 // IsSame returns true when all Modules use the same Package Version.

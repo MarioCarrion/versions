@@ -1,9 +1,9 @@
 package versions_test
 
 import (
-	"fmt"
 	"go/build"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -281,7 +281,7 @@ func Test_Package(t *testing.T) {
 					os.Setenv("GOPATH", old)
 				}
 			},
-			"/blah/pkg/mod/NewPath@NewVersion",
+			filepath.Join("/blah", "pkg", "mod", "NewPath@NewVersion"),
 		},
 		{
 			"Yes GOPATH + Yes Version + Yes ReplacedPath + No ReplacedVersion",
@@ -297,7 +297,7 @@ func Test_Package(t *testing.T) {
 					os.Setenv("GOPATH", old)
 				}
 			},
-			"/blah/pkg/mod/NewPath",
+			filepath.Join("/blah", "pkg", "mod", "NewPath"),
 		},
 		{
 			"Yes GOPATH + Yes Version + No ReplacedPath + Yes ReplacedVersion",
@@ -313,7 +313,7 @@ func Test_Package(t *testing.T) {
 					os.Setenv("GOPATH", old)
 				}
 			},
-			"/blah/pkg/mod/Name@Version",
+			filepath.Join("/blah", "pkg", "mod", "Name@Version"),
 		},
 		{
 			"Yes GOPATH + No Version + Yes ReplacedPath + Yes ReplacedVersion",
@@ -329,7 +329,7 @@ func Test_Package(t *testing.T) {
 					os.Setenv("GOPATH", old)
 				}
 			},
-			"/blah/pkg/mod/NewPath@NewVersion",
+			filepath.Join("/blah", "pkg", "mod", "NewPath@NewVersion"),
 		},
 		{
 			"Yes GOPATH + Yes Version + No ReplacedPath + Yes ReplacedVersion",
@@ -345,7 +345,7 @@ func Test_Package(t *testing.T) {
 					os.Setenv("GOPATH", old)
 				}
 			},
-			"/blah/pkg/mod/Name@Version",
+			filepath.Join("/blah", "pkg", "mod", "Name@Version"),
 		},
 		{
 			"No GOPATH",
@@ -356,7 +356,7 @@ func Test_Package(t *testing.T) {
 			func() func() {
 				return func() {}
 			},
-			fmt.Sprintf("%s/pkg/mod/Name@Version", build.Default.GOPATH),
+			filepath.Join("/", build.Default.GOPATH, "pkg", "mod", "Name@Version"),
 		},
 	}
 

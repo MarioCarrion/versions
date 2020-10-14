@@ -1,11 +1,66 @@
 package versions
 
 import (
+	"go/build"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/senseyeio/diligent"
 )
+
+func Test_goModCache(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		setup  func() func()
+		output string
+	}{
+		{
+			"GOMODCACHE",
+			func() func() {
+				old := os.Getenv("GOMODCACHE")
+				os.Setenv("GOMODCACHE", "/gomodcache")
+				return func() {
+					os.Setenv("GOMODCACHE", old)
+				}
+			},
+			"/gomodcache",
+		},
+		{
+			"GOPATH",
+			func() func() {
+				old := os.Getenv("GOPATH")
+				os.Setenv("GOPATH", "/gopath")
+				return func() {
+					os.Setenv("GOPATH", old)
+				}
+			},
+			filepath.Join("/gopath", "pkg", "mod"),
+		},
+		{
+			"Default",
+			func() func() {
+				return func() {}
+			},
+			filepath.Join("/", build.Default.GOPATH, "pkg", "mod"),
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			teardown := test.setup()
+			defer teardown()
+
+			if actual := goModCache(); actual != test.output {
+				t.Fatalf("expected %s, got %s", test.output, actual)
+			}
+		})
+	}
+}
 
 func Test_newLicense(t *testing.T) {
 	t.Parallel()

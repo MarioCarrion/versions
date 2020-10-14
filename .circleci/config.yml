@@ -3,7 +3,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.14.4
+      - image: circleci/golang:1.15.2
     steps:
       - checkout
       - run: go mod download
@@ -11,13 +11,13 @@ jobs:
       - run: go test -v ./...
   build:
     docker:
-      - image: circleci/golang:1.14.4
+      - image: circleci/golang:1.15.2
     steps:
       - checkout
       - run: go build github.com/MarioCarrion/versions
   lint:
     docker:
-      - image: circleci/golang:1.14.4
+      - image: circleci/golang:1.15.2
     steps:
       - checkout
       - run: go mod tidy
@@ -26,7 +26,7 @@ jobs:
       - run: nit -include-tests -pkg github.com/MarioCarrion/versions $(go list ./...)
   release:
     docker:
-      - image: circleci/golang:1.14.4
+      - image: circleci/golang:1.15.2
     steps:
       - checkout
       - run: curl -sL https://git.io/goreleaser | bash
