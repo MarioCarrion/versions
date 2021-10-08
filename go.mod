@@ -9,5 +9,5 @@ require (
 	github.com/google/go-cmp v0.5.6
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/senseyeio/diligent v0.0.0-20200618092025-134592e3dea7
-	golang.org/x/mod v0.2.0
+	golang.org/x/mod v0.5.1
 )
